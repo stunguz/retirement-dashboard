@@ -316,8 +316,9 @@ function fmtK(n) { return n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' : '$' + Math
 // Connecticut state tax (2025): progressive 3%-6.99%, MFJ standard deduction $24,000
 // SS exempt if AGI < $100k MFJ. 401k/pension: 75% deductible in 2025 if AGI < $100k, phasing to 0% at $150k
 function calcStateTax_CT(w4k, totalSS, pension, fedAGI) {
-  // SS: exempt if fedAGI < 100k MFJ
-  const ssIncome = fedAGI < 100000 ? 0 : totalSS * Math.min(1, (fedAGI - 100000) / 50000);
+  // SS: exempt if fedAGI < 100k MFJ; above $100k, max 25% of SS is taxable (CT cap)
+  let ssIncome = 0;
+  if (fedAGI >= 100000) ssIncome = Math.min(totalSS * 0.25, totalSS * (fedAGI - 100000) / 50000);
   // 401k+pension: 75% deductible in 2025 for AGI < 100k, phase out to 0% at 150k
   let deductPct = 0;
   if (fedAGI < 100000) deductPct = 0.75;
