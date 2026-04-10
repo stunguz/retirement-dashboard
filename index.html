@@ -171,7 +171,7 @@
       <div class="metric" id="m-port-card">
         <div class="mlabel">Portfolio at 96</div>
         <div class="mval" id="m-end">—</div>
-        <div class="msub">projected remaining</div>
+        <div class="msub" id="m-end-sub">financial assets</div>
       </div>
       <div class="metric">
         <div class="mlabel">Avg Annual Income</div>
@@ -214,6 +214,8 @@
           <span><span class="dot" style="background:#1a2744"></span>401k Total</span>
           <span><span class="dot" style="background:#3b82f6"></span>House Cash</span>
           <span><span class="dot" style="background:#10b981"></span>Total Portfolio</span>
+          <span><span class="dot" style="background:#f59e0b"></span>House Value</span>
+          <span><span class="dot" style="background:#7c3aed"></span>Total Assets</span>
         </div>
         <div style="position:relative;height:200px;">
           <canvas id="portChart" role="img" aria-label="Portfolio balance chart over time"></canvas>
@@ -279,7 +281,8 @@
               <th>Stefan 401k</th>
               <th>Julie 401k</th>
               <th>House Cash</th>
-              <th>Total Port.</th>
+              <th>House Value</th>
+              <th>Total Assets</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -424,7 +427,8 @@ function runModel(p) {
     houseCash *= (1 + p.retRate);
     const totalPort = s401k + j401k + houseCash;
     const afterTax = totalSS + pension + wH + w4k - ft - st;
-    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, w4kS, w4kJ, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
+    const totalAssets = Math.max(0,s401k) + Math.max(0,j401k) + Math.max(0,houseCash) + houseVal;
+    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, w4kS, w4kJ, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, totalAssets, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
   }
   return rows;
 }
@@ -472,6 +476,7 @@ function update() {
   const endPort = endRow.totalPort;
   const mEnd = document.getElementById('m-end');
   mEnd.textContent = fmtK(Math.max(0, endPort));
+  document.getElementById('m-end-sub').textContent = 'financial assets (house: ' + fmtK(endRow.houseVal) + ')';
   const card = document.getElementById('m-port-card');
   card.className = 'metric ' + (endPort < 0 ? 'warn' : endPort > 500000 ? 'good' : '');
   document.getElementById('m-income').textContent = fmt(avgIncome);
@@ -500,6 +505,8 @@ function update() {
   const tot401k = rows.map(r => Math.round(r.s401k + r.j401k));
   const hcash = rows.map(r => Math.round(r.houseCash));
   const totPort = rows.map(r => Math.round(r.totalPort));
+  const totAssets = rows.map(r => Math.round(r.totalAssets));
+  const houseValData = rows.map(r => Math.round(r.houseVal));
 
   if (portChart) portChart.destroy();
   portChart = new Chart(document.getElementById('portChart'), {
@@ -507,7 +514,9 @@ function update() {
     data: { labels, datasets: [
       { label: '401k', data: tot401k, borderColor: '#1a2744', backgroundColor: 'rgba(26,39,68,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
       { label: 'House Cash', data: hcash, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
-      { label: 'Total', data: totPort, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2.5, pointRadius: 0, borderDash: [4,3] }
+      { label: 'Total Portfolio', data: totPort, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [4,3] },
+      { label: 'House Value', data: houseValData, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 0, borderDash: [2,2] },
+      { label: 'Total Assets', data: totAssets, borderColor: '#7c3aed', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2.5, pointRadius: 0 }
     ]},
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
   });
@@ -572,6 +581,8 @@ function update() {
       <td class="${r.j401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.j401k))}</td>
       <td class="${r.houseCash < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.houseCash))}</td>
       <td style="font-weight:700">${fmt(Math.max(0, r.totalPort))}</td>
+      <td>${fmt(r.houseVal)}</td>
+      <td style="font-weight:700;color:#1a2744">${fmt(r.totalAssets)}</td>
     </tr>`).join('');
 }
 
