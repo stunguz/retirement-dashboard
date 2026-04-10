@@ -172,9 +172,9 @@
         <div class="msub">after-tax, yr 1 dollars</div>
       </div>
       <div class="metric">
-        <div class="mlabel">Peak Monthly</div>
+        <div class="mlabel">Peak Annual Income</div>
         <div class="mval" id="m-monthly">—</div>
-        <div class="msub">after-tax nominal</div>
+        <div class="msub">after-tax, nominal</div>
       </div>
     </div>
 
@@ -367,8 +367,8 @@ function update() {
   mEnd.textContent = fmtK(Math.max(0, endPort));
   const card = document.getElementById('m-port-card');
   card.className = 'metric ' + (endPort < 0 ? 'warn' : endPort > 500000 ? 'good' : '');
-  document.getElementById('m-income').textContent = fmtK(avgIncome);
-  document.getElementById('m-monthly').textContent = fmtK(maxMonthly / 12);
+  document.getElementById('m-income').textContent = fmt(avgIncome);
+  document.getElementById('m-monthly').textContent = fmt(maxMonthly);
 
   const labels = rows.map(r => r.sAge);
   const tot401k = rows.map(r => Math.round(r.s401k + r.j401k));
