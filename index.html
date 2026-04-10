@@ -194,7 +194,8 @@
         <h3>Annual After-Tax Income</h3>
         <div class="legend">
           <span><span class="dot" style="background:#3b82f6"></span>SS + Pension</span>
-          <span><span class="dot" style="background:#f59e0b"></span>401k Withdrawal</span>
+          <span><span class="dot" style="background:#f59e0b"></span>Stefan 401k W/D</span>
+          <span><span class="dot" style="background:#f97316"></span>Julie 401k W/D</span>
           <span><span class="dot" style="background:#10b981"></span>House Cash</span>
         </div>
         <div style="position:relative;height:200px;">
@@ -228,13 +229,15 @@
               <th>Age</th>
               <th>SS Total</th>
               <th>Pension</th>
-              <th>401k W/D</th>
+              <th>Stefan W/D</th>
+              <th>Julie W/D</th>
               <th>House W/D</th>
               <th>Fed Tax</th>
               <th>State Tax</th>
               <th>After-Tax</th>
               <th>Monthly</th>
-              <th>401k Balance</th>
+              <th>Stefan 401k</th>
+              <th>Julie 401k</th>
               <th>House Cash</th>
               <th>Total Port.</th>
             </tr>
@@ -309,15 +312,18 @@ function runModel(p) {
       }
     }
     const total4kPre = s401k + j401k;
+    let w4kS = 0, w4kJ = 0;
     if (total4kPre > 0) {
       const ratioS = s401k / total4kPre;
-      s401k = (s401k - w4k * ratioS) * (1 + p.retRate);
-      j401k = (j401k - w4k * (1 - ratioS)) * (1 + p.retRate);
+      w4kS = w4k * ratioS;
+      w4kJ = w4k * (1 - ratioS);
+      s401k = (s401k - w4kS) * (1 + p.retRate);
+      j401k = (j401k - w4kJ) * (1 + p.retRate);
     }
     houseCash *= (1 + p.retRate);
     const totalPort = s401k + j401k + houseCash;
     const afterTax = totalSS + pension + wH + w4k - ft - st;
-    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
+    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, w4kS, w4kJ, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
   }
   return rows;
 }
@@ -388,13 +394,16 @@ function update() {
 
   const ssData = rows.map(r => Math.round(r.totalSS + r.pension));
   const wd4k = rows.map(r => Math.round(r.w4k));
+  const wd4kS = rows.map(r => Math.round(r.w4kS));
+  const wd4kJ = rows.map(r => Math.round(r.w4kJ));
   const wdH = rows.map(r => Math.round(r.wH));
   if (incomeChart) incomeChart.destroy();
   incomeChart = new Chart(document.getElementById('incomeChart'), {
     type: 'bar',
     data: { labels, datasets: [
       { label: 'SS+Pension', data: ssData, backgroundColor: '#3b82f6' },
-      { label: '401k W/D', data: wd4k, backgroundColor: '#f59e0b' },
+      { label: 'Stefan 401k W/D', data: wd4kS, backgroundColor: '#f59e0b' },
+      { label: 'Julie 401k W/D', data: wd4kJ, backgroundColor: '#f97316' },
       { label: 'House Cash', data: wdH, backgroundColor: '#10b981' }
     ]},
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
@@ -418,13 +427,15 @@ function update() {
       <td>${r.sAge}</td>
       <td>${fmt(r.totalSS)}</td>
       <td>${fmt(r.pension)}</td>
-      <td>${fmt(r.w4k)}</td>
+      <td>${fmt(r.w4kS)}</td>
+      <td>${fmt(r.w4kJ)}</td>
       <td>${fmt(r.wH)}</td>
       <td style="color:#c0392b">${fmt(r.ft)}</td>
       <td style="color:#e67e22">${fmt(r.st)}</td>
       <td style="font-weight:700;color:#1a7a4a">${fmt(r.afterTax)}</td>
       <td style="font-weight:600">${fmt(r.monthly)}</td>
-      <td class="${r.s401k + r.j401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.s401k + r.j401k))}</td>
+      <td class="${r.s401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.s401k))}</td>
+      <td class="${r.j401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.j401k))}</td>
       <td class="${r.houseCash < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.houseCash))}</td>
       <td style="font-weight:700">${fmt(Math.max(0, r.totalPort))}</td>
     </tr>`).join('');
