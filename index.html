@@ -152,6 +152,13 @@
       </select>
     </div>
     <div style="font-size:11px;color:#888;padding:4px 0 8px;">Stefan SS: $4,000/mo (fixed). Pension: $1,600/mo (fixed).</div>
+
+    <h2>State of Residence</h2>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="btn-ct" onclick="setState('CT')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #1a2744;background:#1a2744;color:white;font-weight:700;font-size:13px;cursor:pointer;">Connecticut</button>
+      <button id="btn-ny" onclick="setState('NY')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:13px;cursor:pointer;">New York</button>
+    </div>
+    <div id="state-note" style="font-size:11px;color:#888;padding:4px 0 8px;line-height:1.5;">CT: SS exempt (AGI&lt;$100k), 75% 401k/pension deduction, 3–6.99% rates.</div>
   </div>
 
   <div class="content">
@@ -175,6 +182,28 @@
         <div class="mlabel">Peak Annual Income</div>
         <div class="mval" id="m-monthly">—</div>
         <div class="msub">after-tax, nominal</div>
+      </div>
+    </div>
+    <div class="metrics" style="margin-bottom:16px;">
+      <div class="metric">
+        <div class="mlabel">28yr Total State Tax</div>
+        <div class="mval" id="m-statetax">—</div>
+        <div class="msub" id="m-statetax-label">CT state taxes</div>
+      </div>
+      <div class="metric good">
+        <div class="mlabel">CT vs NY Savings</div>
+        <div class="mval" id="m-savings">—</div>
+        <div class="msub">if living in CT vs NY</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Avg Annual State Tax</div>
+        <div class="mval" id="m-avgstate">—</div>
+        <div class="msub" id="m-avgstate-label">per year</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Effective State Rate</div>
+        <div class="mval" id="m-effrate">—</div>
+        <div class="msub">avg on gross income</div>
       </div>
     </div>
 
@@ -205,13 +234,24 @@
     </div>
 
     <div class="chart-full">
-      <h3>Tax Breakdown: Federal + State by Year</h3>
+      <h3 id="tax-chart-title">Tax Breakdown: Federal + CT State by Year</h3>
       <div class="legend">
         <span><span class="dot" style="background:#e74c3c"></span>Federal Tax</span>
         <span><span class="dot" style="background:#e67e22"></span>State Tax (CT)</span>
       </div>
       <div style="position:relative;height:160px;">
         <canvas id="taxChart" role="img" aria-label="Tax burden chart by year"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-full">
+      <h3>CT vs NY State Tax Comparison by Year</h3>
+      <div class="legend">
+        <span><span class="dot" style="background:#1a2744"></span>Connecticut</span>
+        <span><span class="dot" style="background:#e74c3c"></span>New York</span>
+      </div>
+      <div style="position:relative;height:160px;">
+        <canvas id="compareChart" role="img" aria-label="CT vs NY state tax comparison by year"></canvas>
       </div>
     </div>
 
@@ -233,7 +273,7 @@
               <th>Julie W/D</th>
               <th>House W/D</th>
               <th>Fed Tax</th>
-              <th>State Tax</th>
+              <th id="th-statetax">State Tax (CT)</th>
               <th>After-Tax</th>
               <th>Monthly</th>
               <th>Stefan 401k</th>
@@ -253,8 +293,66 @@
 const JULIE_SS_LOOKUP = {66: 3641, 67: 3900, 68: 4135, 69: 4447, 70: 4838};
 const RMD_FACTORS = {73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2,91:11.5,92:10.8,93:10.1,94:9.5,95:8.9,96:8.4};
 
+let currentState = 'CT';
+function setState(s) {
+  currentState = s;
+  document.getElementById('btn-ct').style.background = s==='CT' ? '#1a2744' : 'white';
+  document.getElementById('btn-ct').style.color = s==='CT' ? 'white' : '#888';
+  document.getElementById('btn-ct').style.borderColor = s==='CT' ? '#1a2744' : '#d0cdc6';
+  document.getElementById('btn-ny').style.background = s==='NY' ? '#1a2744' : 'white';
+  document.getElementById('btn-ny').style.color = s==='NY' ? 'white' : '#888';
+  document.getElementById('btn-ny').style.borderColor = s==='NY' ? '#1a2744' : '#d0cdc6';
+  const notes = {
+    CT: 'CT: SS exempt (AGI<$100k MFJ), 75% 401k/pension deduction (2025), 3–6.99% rates.',
+    NY: 'NY: SS always exempt, $40k pension exclusion (MFJ), 4–10.9% rates.'
+  };
+  document.getElementById('state-note').textContent = notes[s];
+  update();
+}
+
 function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
 function fmtK(n) { return n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' : '$' + Math.round(n/1000) + 'k'; }
+
+// Connecticut state tax (2025): progressive 3%-6.99%, MFJ standard deduction $24,000
+// SS exempt if AGI < $100k MFJ. 401k/pension: 75% deductible in 2025 if AGI < $100k, phasing to 0% at $150k
+function calcStateTax_CT(w4k, totalSS, pension, fedAGI) {
+  // SS: exempt if fedAGI < 100k MFJ
+  const ssIncome = fedAGI < 100000 ? 0 : totalSS * Math.min(1, (fedAGI - 100000) / 50000);
+  // 401k+pension: 75% deductible in 2025 for AGI < 100k, phase out to 0% at 150k
+  let deductPct = 0;
+  if (fedAGI < 100000) deductPct = 0.75;
+  else if (fedAGI < 150000) deductPct = 0.75 * (1 - (fedAGI - 100000) / 50000);
+  const retDeduction = (w4k + pension) * deductPct;
+  const ctTI = Math.max(0, w4k + pension + ssIncome - retDeduction - 24000);
+  // CT 2025 MFJ brackets
+  let ct = 0;
+  if (ctTI <= 20000) ct = ctTI * 0.03;
+  else if (ctTI <= 100000) ct = 600 + (ctTI - 20000) * 0.05;
+  else if (ctTI <= 200000) ct = 4600 + (ctTI - 100000) * 0.055;
+  else if (ctTI <= 400000) ct = 10100 + (ctTI - 200000) * 0.06;
+  else if (ctTI <= 600000) ct = 22100 + (ctTI - 400000) * 0.065;
+  else ct = 35100 + (ctTI - 600000) * 0.0699;
+  return ct;
+}
+
+// New York state tax (2025): MFJ brackets 4%-10.9%, standard deduction $16,050
+// SS: always exempt. Pension/401k: $20k exclusion per spouse (age 59.5+) = $40k total MFJ
+function calcStateTax_NY(w4k, totalSS, pension) {
+  // $40k pension/retirement exclusion for MFJ (both spouses 59.5+)
+  const retDeduction = Math.min(w4k + pension, 40000);
+  const nyTI = Math.max(0, w4k + pension - retDeduction - 16050);
+  // NY 2025 MFJ brackets
+  let ny = 0;
+  if (nyTI <= 17150) ny = nyTI * 0.04;
+  else if (nyTI <= 23600) ny = 686 + (nyTI - 17150) * 0.045;
+  else if (nyTI <= 27900) ny = 976 + (nyTI - 23600) * 0.0525;
+  else if (nyTI <= 161550) ny = 1202 + (nyTI - 27900) * 0.055;
+  else if (nyTI <= 323200) ny = 8552 + (nyTI - 161550) * 0.06;
+  else if (nyTI <= 2155350) ny = 18251 + (nyTI - 323200) * 0.0685;
+  else if (nyTI <= 5000000) ny = 143754 + (nyTI - 2155350) * 0.0965;
+  else ny = 418280 + (nyTI - 5000000) * 0.103;
+  return ny;
+}
 
 function calcTax(w4k, totalSS, pension) {
   const prov = w4k + pension + 0.5 * totalSS;
@@ -267,7 +365,9 @@ function calcTax(w4k, totalSS, pension) {
   else if (fedTI < 94300) fTax = 2320 + (fedTI - 23200) * 0.12;
   else if (fedTI < 201050) fTax = 10852 + (fedTI - 94300) * 0.22;
   else fTax = 34337 + (fedTI - 201050) * 0.24;
-  const sTax = Math.max(0, w4k - 24000) * 0.05;
+  // State tax based on selected state
+  const fedAGI = w4k + pension + ssTaxable;
+  const sTax = currentState === 'CT' ? calcStateTax_CT(w4k, totalSS, pension, fedAGI) : calcStateTax_NY(w4k, totalSS, pension);
   return [fTax, sTax];
 }
 
@@ -328,7 +428,7 @@ function runModel(p) {
   return rows;
 }
 
-let portChart, incomeChart, taxChart;
+let portChart, incomeChart, taxChart, compareChart;
 
 function getParams() {
   return {
@@ -376,6 +476,25 @@ function update() {
   document.getElementById('m-income').textContent = fmt(avgIncome);
   document.getElementById('m-monthly').textContent = fmt(maxMonthly);
 
+  const totalStateTax = rows.reduce((a, r) => a + r.st, 0);
+  const avgStateTax = totalStateTax / rows.length;
+  const totalGross = rows.reduce((a, r) => a + r.totalSS + r.pension + r.wH + r.w4k, 0);
+  const effRate = totalGross > 0 ? (totalStateTax / totalGross * 100) : 0;
+  const savedState = currentState;
+  currentState = 'CT'; const rowsCT = runModel(p);
+  currentState = 'NY'; const rowsNY = runModel(p);
+  currentState = savedState;
+  const totalCT = rowsCT.reduce((a, r) => a + r.st, 0);
+  const totalNY = rowsNY.reduce((a, r) => a + r.st, 0);
+  const savings = totalNY - totalCT;
+  document.getElementById('m-statetax').textContent = fmtK(totalStateTax);
+  document.getElementById('m-statetax-label').textContent = currentState + ' state taxes (28yr)';
+  document.getElementById('m-savings').textContent = savings >= 0 ? '+' + fmtK(savings) : fmtK(savings);
+  document.getElementById('m-avgstate').textContent = fmt(avgStateTax) + '/yr';
+  document.getElementById('m-avgstate-label').textContent = currentState + ' avg per year';
+  document.getElementById('m-effrate').textContent = effRate.toFixed(1) + '%';
+  document.getElementById('m-savings').parentElement.className = 'metric ' + (savings > 0 ? 'good' : savings < 0 ? 'warn' : '');
+
   const labels = rows.map(r => r.sAge);
   const tot401k = rows.map(r => Math.round(r.s401k + r.j401k));
   const hcash = rows.map(r => Math.round(r.houseCash));
@@ -411,16 +530,30 @@ function update() {
 
   const fedTax = rows.map(r => Math.round(r.ft));
   const stTax = rows.map(r => Math.round(r.st));
+  const ctTaxData = rowsCT.map(r => Math.round(r.st));
+  const nyTaxData = rowsNY.map(r => Math.round(r.st));
+  document.getElementById('tax-chart-title').textContent = 'Tax Breakdown: Federal + ' + currentState + ' State by Year';
   if (taxChart) taxChart.destroy();
   taxChart = new Chart(document.getElementById('taxChart'), {
     type: 'bar',
     data: { labels, datasets: [
       { label: 'Federal', data: fedTax, backgroundColor: '#e74c3c' },
-      { label: 'State', data: stTax, backgroundColor: '#e67e22' }
+      { label: currentState + ' State', data: stTax, backgroundColor: '#e67e22' }
     ]},
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
   });
 
+  if (compareChart) compareChart.destroy();
+  compareChart = new Chart(document.getElementById('compareChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: 'Connecticut', data: ctTaxData, borderColor: '#1a2744', backgroundColor: 'rgba(26,39,68,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+      { label: 'New York', data: nyTaxData, borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [4,3] }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
+  });
+
+  document.getElementById('th-statetax').textContent = 'State Tax (' + currentState + ')';
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = rows.map(r => `
     <tr class="tier${r.tier}">
