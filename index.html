@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Planning Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f7f4; color: #1a1a1a; font-size: 14px; }
+  
+  .header { background: #1a2744; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  .header .subtitle { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+  
+  .main { display: grid; grid-template-columns: 300px 1fr; gap: 0; min-height: calc(100vh - 56px); }
+  
+  .sidebar { background: white; border-right: 1px solid #e8e6e0; padding: 16px; overflow-y: auto; }
+  .sidebar h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #888; margin: 16px 0 10px; }
+  .sidebar h2:first-child { margin-top: 0; }
+  
+  .slider-row { margin-bottom: 12px; }
+  .slider-row label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 12px; color: #555; }
+  .slider-row label span { font-weight: 600; color: #1a2744; font-size: 13px; }
+  input[type=range] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: #e0ddd6; border-radius: 2px; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #1a2744; cursor: pointer; }
+  
+  .tier-box { background: #f0f4ff; border: 1px solid #c8d4f8; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .tier-box .tier-label { font-size: 11px; font-weight: 700; color: #2244aa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  
+  .content { padding: 16px; overflow-y: auto; }
+  
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .metric { background: white; border-radius: 8px; padding: 12px 14px; border: 1px solid #e8e6e0; }
+  .metric .mlabel { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .metric .mval { font-size: 20px; font-weight: 700; color: #1a2744; line-height: 1; }
+  .metric .msub { font-size: 11px; color: #aaa; margin-top: 3px; }
+  .metric.warn .mval { color: #c0392b; }
+  .metric.good .mval { color: #1a7a4a; }
+  
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .chart-box { background: white; border-radius: 8px; border: 1px solid #e8e6e0; padding: 14px; }
+  .chart-box h3 { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .chart-full { background: white; border-radius: 8px; border: 1px solid #e8e6e0; padding: 14px; margin-bottom: 16px; }
+  .chart-full h3 { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { background: #1a2744; color: white; padding: 7px 8px; text-align: right; font-weight: 600; font-size: 11px; white-space: nowrap; }
+  thead th:first-child { text-align: center; }
+  tbody tr:nth-child(even) { background: #f8f7f4; }
+  tbody tr:hover { background: #eef2ff; }
+  tbody td { padding: 5px 8px; text-align: right; border-bottom: 1px solid #f0ede8; white-space: nowrap; }
+  tbody td:first-child { text-align: center; font-weight: 700; color: #1a2744; }
+  .tier1 td:first-child { border-left: 3px solid #3b82f6; }
+  .tier2 td:first-child { border-left: 3px solid #f59e0b; }
+  .tier3 td:first-child { border-left: 3px solid #10b981; }
+  .depleted { color: #c0392b !important; font-weight: 700; }
+  
+  .table-scroll { overflow-x: auto; max-height: 340px; overflow-y: auto; }
+  .table-scroll thead th { position: sticky; top: 0; z-index: 1; }
+  
+  .legend { display: flex; gap: 16px; font-size: 11px; color: #666; margin-bottom: 8px; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="h1">Retirement Planning Dashboard</div>
+    <div class="subtitle">Stefan & Julie · Interactive Projection Model</div>
+  </div>
+  <div style="font-size:12px;opacity:0.5;">Ages 69–96</div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <h2>Spending Tiers</h2>
+    
+    <div class="tier-box">
+      <div class="tier-label">Tier 1 — Early Retirement</div>
+      <div class="slider-row">
+        <label>Net Goal <span id="t1g-out">$240,000</span></label>
+        <input type="range" id="t1g" min="100000" max="400000" step="5000" value="240000">
+      </div>
+      <div class="slider-row">
+        <label>Through Age <span id="t1e-out">75</span></label>
+        <input type="range" id="t1e" min="70" max="80" step="1" value="75">
+      </div>
+    </div>
+    
+    <div class="tier-box" style="background:#fff8ec;border-color:#f5d68a;">
+      <div class="tier-label" style="color:#b07d00;">Tier 2 — Mid Retirement</div>
+      <div class="slider-row">
+        <label>Net Goal <span id="t2g-out">$180,000</span></label>
+        <input type="range" id="t2g" min="80000" max="300000" step="5000" value="180000">
+      </div>
+      <div class="slider-row">
+        <label>Through Age <span id="t2e-out">82</span></label>
+        <input type="range" id="t2e" min="76" max="88" step="1" value="82">
+      </div>
+    </div>
+    
+    <div class="tier-box" style="background:#ecfdf5;border-color:#86efac;">
+      <div class="tier-label" style="color:#065f46;">Tier 3 — Late Retirement</div>
+      <div class="slider-row">
+        <label>Net Goal <span id="t3g-out">$150,000</span></label>
+        <input type="range" id="t3g" min="60000" max="250000" step="5000" value="150000">
+      </div>
+    </div>
+
+    <h2>Portfolio</h2>
+    <div class="slider-row">
+      <label>Stefan 401k <span id="s4k-out">$660k</span></label>
+      <input type="range" id="s4k" min="0" max="2000000" step="10000" value="660000">
+    </div>
+    <div class="slider-row">
+      <label>Julie 401k <span id="j4k-out">$1,340k</span></label>
+      <input type="range" id="j4k" min="0" max="3000000" step="10000" value="1340000">
+    </div>
+
+    <h2>Real Estate</h2>
+    <div class="slider-row">
+      <label>Home Sale Proceeds <span id="old-out">$1,900k</span></label>
+      <input type="range" id="old" min="500000" max="4000000" step="50000" value="1900000">
+    </div>
+    <div class="slider-row">
+      <label>New Home Cost <span id="new-out">$1,100k</span></label>
+      <input type="range" id="new" min="200000" max="2500000" step="50000" value="1100000">
+    </div>
+
+    <h2>Market Assumptions</h2>
+    <div class="slider-row">
+      <label>Annual Return <span id="ret-out">3.0%</span></label>
+      <input type="range" id="ret" min="0" max="10" step="0.5" value="3">
+    </div>
+    <div class="slider-row">
+      <label>Inflation Rate <span id="inf-out">2.0%</span></label>
+      <input type="range" id="inf" min="0" max="6" step="0.25" value="2">
+    </div>
+    
+    <h2>Social Security</h2>
+    <div class="slider-row" style="margin-bottom:10px;">
+      <label style="margin-bottom:6px;display:block;">Julie SS Start Age & Monthly Benefit</label>
+      <select id="jss" style="width:100%;padding:6px 8px;border:1px solid #d0cdc6;border-radius:6px;font-size:13px;background:white;color:#1a2744;cursor:pointer;">
+        <option value="66">Age 66 — $3,641/mo</option>
+        <option value="67">Age 67 — $3,900/mo</option>
+        <option value="68">Age 68 — $4,135/mo</option>
+        <option value="69" selected>Age 69 — $4,447/mo</option>
+        <option value="70">Age 70 — $4,838/mo</option>
+      </select>
+    </div>
+    <div style="font-size:11px;color:#888;padding:4px 0 8px;">Stefan SS: $4,000/mo (fixed). Pension: $1,600/mo (fixed).</div>
+  </div>
+
+  <div class="content">
+    <div class="metrics">
+      <div class="metric">
+        <div class="mlabel">Starting Portfolio</div>
+        <div class="mval" id="m-start">$2.0M</div>
+        <div class="msub">401k + house cash</div>
+      </div>
+      <div class="metric" id="m-port-card">
+        <div class="mlabel">Portfolio at 96</div>
+        <div class="mval" id="m-end">—</div>
+        <div class="msub">projected remaining</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Avg Annual Income</div>
+        <div class="mval" id="m-income">—</div>
+        <div class="msub">after-tax, yr 1 dollars</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Peak Monthly</div>
+        <div class="mval" id="m-monthly">—</div>
+        <div class="msub">after-tax nominal</div>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Portfolio Balance Over Time</h3>
+        <div class="legend">
+          <span><span class="dot" style="background:#1a2744"></span>401k Total</span>
+          <span><span class="dot" style="background:#3b82f6"></span>House Cash</span>
+          <span><span class="dot" style="background:#10b981"></span>Total Portfolio</span>
+        </div>
+        <div style="position:relative;height:200px;">
+          <canvas id="portChart" role="img" aria-label="Portfolio balance chart over time"></canvas>
+        </div>
+      </div>
+      <div class="chart-box">
+        <h3>Annual After-Tax Income</h3>
+        <div class="legend">
+          <span><span class="dot" style="background:#3b82f6"></span>SS + Pension</span>
+          <span><span class="dot" style="background:#f59e0b"></span>401k Withdrawal</span>
+          <span><span class="dot" style="background:#10b981"></span>House Cash</span>
+        </div>
+        <div style="position:relative;height:200px;">
+          <canvas id="incomeChart" role="img" aria-label="Annual income sources stacked chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-full">
+      <h3>Tax Breakdown: Federal + State by Year</h3>
+      <div class="legend">
+        <span><span class="dot" style="background:#e74c3c"></span>Federal Tax</span>
+        <span><span class="dot" style="background:#e67e22"></span>State Tax (CT)</span>
+      </div>
+      <div style="position:relative;height:160px;">
+        <canvas id="taxChart" role="img" aria-label="Tax burden chart by year"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-full">
+      <h3>Year-by-Year Projection Table</h3>
+      <div class="legend" style="margin-bottom:8px;">
+        <span><span class="dot" style="background:#3b82f6"></span>Tier 1</span>
+        <span><span class="dot" style="background:#f59e0b"></span>Tier 2</span>
+        <span><span class="dot" style="background:#10b981"></span>Tier 3</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Age</th>
+              <th>SS Total</th>
+              <th>Pension</th>
+              <th>401k W/D</th>
+              <th>House W/D</th>
+              <th>Fed Tax</th>
+              <th>State Tax</th>
+              <th>After-Tax</th>
+              <th>Monthly</th>
+              <th>401k Balance</th>
+              <th>House Cash</th>
+              <th>Total Port.</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const JULIE_SS_LOOKUP = {66: 3641, 67: 3900, 68: 4135, 69: 4447, 70: 4838};
+const RMD_FACTORS = {73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2,91:11.5,92:10.8,93:10.1,94:9.5,95:8.9,96:8.4};
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+function fmtK(n) { return n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' : '$' + Math.round(n/1000) + 'k'; }
+
+function calcTax(w4k, totalSS, pension) {
+  const prov = w4k + pension + 0.5 * totalSS;
+  let ssTaxable = 0;
+  if (prov > 44000) ssTaxable = Math.min(0.85 * totalSS, 0.85 * (prov - 44000) + 6000);
+  else if (prov > 32000) ssTaxable = 0.5 * (prov - 32000);
+  const fedTI = Math.max(0, w4k + pension + ssTaxable - 32300);
+  let fTax = 0;
+  if (fedTI < 23200) fTax = fedTI * 0.1;
+  else if (fedTI < 94300) fTax = 2320 + (fedTI - 23200) * 0.12;
+  else if (fedTI < 201050) fTax = 10852 + (fedTI - 94300) * 0.22;
+  else fTax = 34337 + (fedTI - 201050) * 0.24;
+  const sTax = Math.max(0, w4k - 24000) * 0.05;
+  return [fTax, sTax];
+}
+
+function runModel(p) {
+  let s401k = p.s4k, j401k = p.j4k;
+  let houseCash = p.old - p.newHome;
+  let houseVal = p.newHome;
+  const rows = [];
+  for (let yr = 0; yr < 28; yr++) {
+    const sAge = 69 + yr, jAge = 66 + yr;
+    const inf = Math.pow(1 + p.infRate, yr);
+    const targetBase = sAge <= p.t1e ? p.t1g : (sAge <= p.t2e ? p.t2g : p.t3g);
+    const target = targetBase * inf;
+    const sSS = 4000 * 12 * inf;
+    const jSSMonthly = JULIE_SS_LOOKUP[p.jssAge] || 4838;
+    const jSS = jAge >= p.jssAge ? jSSMonthly * 12 * inf : 0;
+    const pension = 1600 * 12 * inf;
+    const totalSS = sSS + jSS;
+    if (yr > 0) houseVal *= (1 + p.infRate);
+    const rPctS = RMD_FACTORS[sAge] ? 1 / RMD_FACTORS[sAge] : 0;
+    const rPctJ = RMD_FACTORS[jAge] ? 1 / RMD_FACTORS[jAge] : 0;
+    const rmdS = s401k * rPctS, rmdJ = j401k * rPctJ;
+    const totalRMD = rmdS + rmdJ;
+    const [fRMD, sRMD] = calcTax(totalRMD, totalSS, pension);
+    const liquidAtRMD = totalSS + pension + totalRMD - fRMD - sRMD;
+    let w4k = totalRMD, ft = fRMD, st = sRMD, wH = 0, surplus = 0;
+    if (liquidAtRMD >= target) {
+      surplus = liquidAtRMD - target;
+      houseCash += surplus;
+    } else {
+      const gap = target - liquidAtRMD;
+      if (houseCash >= gap) { wH = gap; houseCash -= gap; }
+      else {
+        wH = houseCash; houseCash = 0;
+        let lo = totalRMD, hi = 10000000;
+        for (let i = 0; i < 30; i++) {
+          const mid = (lo + hi) / 2;
+          const [fm, sm] = calcTax(mid, totalSS, pension);
+          if (totalSS + pension + mid + wH - fm - sm < target) lo = mid; else hi = mid;
+        }
+        w4k = lo; [ft, st] = calcTax(lo, totalSS, pension);
+      }
+    }
+    const total4kPre = s401k + j401k;
+    if (total4kPre > 0) {
+      const ratioS = s401k / total4kPre;
+      s401k = (s401k - w4k * ratioS) * (1 + p.retRate);
+      j401k = (j401k - w4k * (1 - ratioS)) * (1 + p.retRate);
+    }
+    houseCash *= (1 + p.retRate);
+    const totalPort = s401k + j401k + houseCash;
+    const afterTax = totalSS + pension + wH + w4k - ft - st;
+    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
+  }
+  return rows;
+}
+
+let portChart, incomeChart, taxChart;
+
+function getParams() {
+  return {
+    t1g: +document.getElementById('t1g').value,
+    t1e: +document.getElementById('t1e').value,
+    t2g: +document.getElementById('t2g').value,
+    t2e: +document.getElementById('t2e').value,
+    t3g: +document.getElementById('t3g').value,
+    s4k: +document.getElementById('s4k').value,
+    j4k: +document.getElementById('j4k').value,
+    old: +document.getElementById('old').value,
+    newHome: +document.getElementById('new').value,
+    retRate: +document.getElementById('ret').value / 100,
+    infRate: +document.getElementById('inf').value / 100,
+    jssAge: +document.getElementById('jss').value  };
+}
+
+function update() {
+  const p = getParams();
+  document.getElementById('t1g-out').textContent = fmtK(p.t1g);
+  document.getElementById('t1e-out').textContent = p.t1e;
+  document.getElementById('t2g-out').textContent = fmtK(p.t2g);
+  document.getElementById('t2e-out').textContent = p.t2e;
+  document.getElementById('t3g-out').textContent = fmtK(p.t3g);
+  document.getElementById('s4k-out').textContent = fmtK(p.s4k);
+  document.getElementById('j4k-out').textContent = fmtK(p.j4k);
+  document.getElementById('old-out').textContent = fmtK(p.old);
+  document.getElementById('new-out').textContent = fmtK(p.newHome);
+  document.getElementById('ret-out').textContent = (+document.getElementById('ret').value).toFixed(1) + '%';
+  document.getElementById('inf-out').textContent = (+document.getElementById('inf').value).toFixed(2) + '%';
+  
+
+  const rows = runModel(p);
+  const startPort = p.s4k + p.j4k + (p.old - p.newHome);
+  const endRow = rows[rows.length - 1];
+  const avgIncome = rows.reduce((a, r) => a + r.afterTax, 0) / rows.length;
+  const maxMonthly = Math.max(...rows.map(r => r.monthly));
+
+  document.getElementById('m-start').textContent = fmtK(startPort);
+  const endPort = endRow.totalPort;
+  const mEnd = document.getElementById('m-end');
+  mEnd.textContent = fmtK(Math.max(0, endPort));
+  const card = document.getElementById('m-port-card');
+  card.className = 'metric ' + (endPort < 0 ? 'warn' : endPort > 500000 ? 'good' : '');
+  document.getElementById('m-income').textContent = fmtK(avgIncome);
+  document.getElementById('m-monthly').textContent = fmtK(maxMonthly / 12);
+
+  const labels = rows.map(r => r.sAge);
+  const tot401k = rows.map(r => Math.round(r.s401k + r.j401k));
+  const hcash = rows.map(r => Math.round(r.houseCash));
+  const totPort = rows.map(r => Math.round(r.totalPort));
+
+  if (portChart) portChart.destroy();
+  portChart = new Chart(document.getElementById('portChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: '401k', data: tot401k, borderColor: '#1a2744', backgroundColor: 'rgba(26,39,68,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+      { label: 'House Cash', data: hcash, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+      { label: 'Total', data: totPort, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2.5, pointRadius: 0, borderDash: [4,3] }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
+  });
+
+  const ssData = rows.map(r => Math.round(r.totalSS + r.pension));
+  const wd4k = rows.map(r => Math.round(r.w4k));
+  const wdH = rows.map(r => Math.round(r.wH));
+  if (incomeChart) incomeChart.destroy();
+  incomeChart = new Chart(document.getElementById('incomeChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'SS+Pension', data: ssData, backgroundColor: '#3b82f6' },
+      { label: '401k W/D', data: wd4k, backgroundColor: '#f59e0b' },
+      { label: 'House Cash', data: wdH, backgroundColor: '#10b981' }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+  });
+
+  const fedTax = rows.map(r => Math.round(r.ft));
+  const stTax = rows.map(r => Math.round(r.st));
+  if (taxChart) taxChart.destroy();
+  taxChart = new Chart(document.getElementById('taxChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Federal', data: fedTax, backgroundColor: '#e74c3c' },
+      { label: 'State', data: stTax, backgroundColor: '#e67e22' }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+  });
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr class="tier${r.tier}">
+      <td>${r.sAge}</td>
+      <td>${fmt(r.totalSS)}</td>
+      <td>${fmt(r.pension)}</td>
+      <td>${fmt(r.w4k)}</td>
+      <td>${fmt(r.wH)}</td>
+      <td style="color:#c0392b">${fmt(r.ft)}</td>
+      <td style="color:#e67e22">${fmt(r.st)}</td>
+      <td style="font-weight:700;color:#1a7a4a">${fmt(r.afterTax)}</td>
+      <td style="font-weight:600">${fmt(r.monthly)}</td>
+      <td class="${r.s401k + r.j401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.s401k + r.j401k))}</td>
+      <td class="${r.houseCash < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.houseCash))}</td>
+      <td style="font-weight:700">${fmt(Math.max(0, r.totalPort))}</td>
+    </tr>`).join('');
+}
+
+document.querySelectorAll('input[type=range], select').forEach(el => el.addEventListener('change', update));
+document.querySelectorAll('input[type=range]').forEach(el => el.addEventListener('input', update));
+update();
+</script>
+</body>
+</html>
