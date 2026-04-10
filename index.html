@@ -205,6 +205,11 @@
         <div class="mval" id="m-effrate">—</div>
         <div class="msub">avg on gross income</div>
       </div>
+      <div class="metric good">
+        <div class="mlabel">Total Assets at 96</div>
+        <div class="mval" id="m-ta">—</div>
+        <div class="msub">incl. house value</div>
+      </div>
     </div>
 
     <div class="chart-row">
@@ -281,6 +286,7 @@
               <th>Stefan 401k</th>
               <th>Julie 401k</th>
               <th>House Cash</th>
+              <th>Total Port.</th>
               <th>House Value</th>
               <th>Total Assets</th>
             </tr>
@@ -499,6 +505,7 @@ function update() {
   document.getElementById('m-avgstate').textContent = fmt(avgStateTax) + '/yr';
   document.getElementById('m-avgstate-label').textContent = currentState + ' avg per year';
   document.getElementById('m-effrate').textContent = effRate.toFixed(1) + '%';
+  document.getElementById('m-ta').textContent = fmtK(endRow.totalAssets);
   document.getElementById('m-savings').parentElement.className = 'metric ' + (savings > 0 ? 'good' : savings < 0 ? 'warn' : '');
 
   const labels = rows.map(r => r.sAge);
@@ -518,7 +525,7 @@ function update() {
       { label: 'House Value', data: houseValData, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 0, borderDash: [2,2] },
       { label: 'Total Assets', data: totAssets, borderColor: '#7c3aed', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2.5, pointRadius: 0 }
     ]},
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
   });
 
   const ssData = rows.map(r => Math.round(r.totalSS + r.pension));
