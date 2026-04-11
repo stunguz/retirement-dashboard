@@ -153,10 +153,18 @@
     </div>
     <div style="font-size:11px;color:#888;padding:4px 0 8px;">Stefan SS: $4,000/mo (fixed). Pension: $1,600/mo (fixed).</div>
 
+    <h2>Property Tax & SALT</h2>
+    <div class="slider-row">
+      <label>Annual Property Tax <span id="ptax-out">$20,000</span></label>
+      <input type="range" id="ptax" min="0" max="40000" step="1000" value="20000">
+    </div>
+    <div style="font-size:11px;color:#888;padding:0 0 10px;line-height:1.5;">SALT cap $40,400 (2025 OBBBA). Property tax deducted from federal taxable income up to cap.</div>
+
     <h2>State of Residence</h2>
     <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button id="btn-ct" onclick="setState('CT')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #1a2744;background:#1a2744;color:white;font-weight:700;font-size:13px;cursor:pointer;">Connecticut</button>
-      <button id="btn-ny" onclick="setState('NY')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:13px;cursor:pointer;">New York</button>
+      <button id="btn-ct" onclick="setState('CT')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #1a2744;background:#1a2744;color:white;font-weight:700;font-size:12px;cursor:pointer;">Connecticut</button>
+      <button id="btn-ny" onclick="setState('NY')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">New York</button>
+      <button id="btn-ca" onclick="setState('CA')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">California</button>
     </div>
     <div id="state-note" style="font-size:11px;color:#888;padding:4px 0 8px;line-height:1.5;">CT: SS exempt (AGI&lt;$100k), 75% 401k/pension deduction, 3–6.99% rates.</div>
   </div>
@@ -217,7 +225,7 @@
         <h3>Portfolio Balance Over Time</h3>
         <div class="legend">
           <span><span class="dot" style="background:#1a2744"></span>401k Total</span>
-          <span><span class="dot" style="background:#3b82f6"></span>House Cash</span>
+          <span><span class="dot" style="background:#3b82f6"></span>Cash Acct</span>
           <span><span class="dot" style="background:#10b981"></span>Total Portfolio</span>
           <span><span class="dot" style="background:#f59e0b"></span>House Value</span>
           <span><span class="dot" style="background:#7c3aed"></span>Total Assets</span>
@@ -287,7 +295,7 @@
               <th>State Rate</th>
               <th>Stefan 401k</th>
               <th>Julie 401k</th>
-              <th>House Cash</th>
+              <th>Cash Acct</th>
               <th>Total Port.</th>
               <th>House Value</th>
               <th>Total Assets</th>
@@ -307,15 +315,18 @@ const RMD_FACTORS = {73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:
 let currentState = 'CT';
 function setState(s) {
   currentState = s;
-  document.getElementById('btn-ct').style.background = s==='CT' ? '#1a2744' : 'white';
-  document.getElementById('btn-ct').style.color = s==='CT' ? 'white' : '#888';
-  document.getElementById('btn-ct').style.borderColor = s==='CT' ? '#1a2744' : '#d0cdc6';
-  document.getElementById('btn-ny').style.background = s==='NY' ? '#1a2744' : 'white';
-  document.getElementById('btn-ny').style.color = s==='NY' ? 'white' : '#888';
-  document.getElementById('btn-ny').style.borderColor = s==='NY' ? '#1a2744' : '#d0cdc6';
+  ['ct','ny','ca'].forEach(st => {
+    const btn = document.getElementById('btn-'+st);
+    if (!btn) return;
+    const active = s === st.toUpperCase();
+    btn.style.background = active ? '#1a2744' : 'white';
+    btn.style.color = active ? 'white' : '#888';
+    btn.style.borderColor = active ? '#1a2744' : '#d0cdc6';
+  });
   const notes = {
-    CT: 'CT: SS exempt (AGI<$100k MFJ), 75% 401k/pension deduction (2025), 3–6.99% rates.',
-    NY: 'NY: SS always exempt, $40k pension exclusion (MFJ), 4–10.9% rates.'
+    CT: 'CT: SS exempt (AGI<$100k MFJ), 75% 401k/pension deduction, 3–6.99% rates.',
+    NY: 'NY: SS always exempt, $40k pension exclusion (MFJ), 4–10.9% rates.',
+    CA: 'CA: SS exempt, 401k/pension fully taxable, std deduction $11,412 MFJ, 1–12.3% rates.'
   };
   document.getElementById('state-note').textContent = notes[s];
   update();
@@ -366,12 +377,29 @@ function calcStateTax_NY(w4k, totalSS, pension) {
   return ny;
 }
 
-function calcTax(w4k, totalSS, pension) {
+// California 2025 state income tax (Married Filing Jointly)
+// SS: fully exempt. 401k/pension: fully taxable. Std deduction: $11,412 MFJ.
+// Brackets use 2025 figures (same as 2024, CA hasn't issued new guidance)
+function calcStateTax_CA(w4k, pension) {
+  const caTI = Math.max(0, w4k + pension - 11412);
+  if (caTI <= 21512)  return caTI * 0.01;
+  if (caTI <= 50998)  return 215   + (caTI - 21512)  * 0.02;
+  if (caTI <= 80490)  return 805   + (caTI - 50998)  * 0.04;
+  if (caTI <= 111732) return 1985  + (caTI - 80490)  * 0.06;
+  if (caTI <= 141212) return 3859  + (caTI - 111732) * 0.08;
+  if (caTI <= 721318) return 6217  + (caTI - 141212) * 0.093;
+  if (caTI <= 865574) return 60167 + (caTI - 721318) * 0.103;
+  if (caTI <= 1442628)return 75026 + (caTI - 865574) * 0.113;
+  return 140233 + (caTI - 1442628) * 0.123;
+}
+
+function calcTax(w4k, totalSS, pension, ptax) {
   const prov = w4k + pension + 0.5 * totalSS;
   let ssTaxable = 0;
   if (prov > 44000) ssTaxable = Math.min(0.85 * totalSS, 0.85 * (prov - 44000) + 6000);
   else if (prov > 32000) ssTaxable = 0.5 * (prov - 32000);
-  const fedTI = Math.max(0, w4k + pension + ssTaxable - 32300);
+  const saltDeduction = Math.min(ptax || 0, 40400);
+  const fedTI = Math.max(0, w4k + pension + ssTaxable - 32300 - saltDeduction);
   let fTax = 0;
   if (fedTI < 23200) fTax = fedTI * 0.1;
   else if (fedTI < 94300) fTax = 2320 + (fedTI - 23200) * 0.12;
@@ -379,7 +407,10 @@ function calcTax(w4k, totalSS, pension) {
   else fTax = 34337 + (fedTI - 201050) * 0.24;
   // State tax based on selected state
   const fedAGI = w4k + pension + ssTaxable;
-  const sTax = currentState === 'CT' ? calcStateTax_CT(w4k, totalSS, pension, fedAGI) : calcStateTax_NY(w4k, totalSS, pension);
+  let sTax = 0;
+  if (currentState === 'CT') sTax = calcStateTax_CT(w4k, totalSS, pension, fedAGI);
+  else if (currentState === 'NY') sTax = calcStateTax_NY(w4k, totalSS, pension);
+  else sTax = calcStateTax_CA(w4k, pension);
   return [fTax, sTax];
 }
 
@@ -403,7 +434,7 @@ function runModel(p) {
     const rPctJ = RMD_FACTORS[jAge] ? 1 / RMD_FACTORS[jAge] : 0;
     const rmdS = s401k * rPctS, rmdJ = j401k * rPctJ;
     const totalRMD = rmdS + rmdJ;
-    const [fRMD, sRMD] = calcTax(totalRMD, totalSS, pension);
+    const [fRMD, sRMD] = calcTax(totalRMD, totalSS, pension, p.ptax);
     const liquidAtRMD = totalSS + pension + totalRMD - fRMD - sRMD;
     let w4k = totalRMD, ft = fRMD, st = sRMD, wH = 0, surplus = 0;
     if (liquidAtRMD >= target) {
@@ -417,10 +448,10 @@ function runModel(p) {
         let lo = totalRMD, hi = 10000000;
         for (let i = 0; i < 30; i++) {
           const mid = (lo + hi) / 2;
-          const [fm, sm] = calcTax(mid, totalSS, pension);
+          const [fm, sm] = calcTax(mid, totalSS, pension, p.ptax);
           if (totalSS + pension + mid + wH - fm - sm < target) lo = mid; else hi = mid;
         }
-        w4k = lo; [ft, st] = calcTax(lo, totalSS, pension);
+        w4k = lo; [ft, st] = calcTax(lo, totalSS, pension, p.ptax);
       }
     }
     const total4kPre = s401k + j401k;
@@ -456,7 +487,8 @@ function getParams() {
     newHome: +document.getElementById('new').value,
     retRate: +document.getElementById('ret').value / 100,
     infRate: +document.getElementById('inf').value / 100,
-    jssAge: +document.getElementById('jss').value  };
+    jssAge: +document.getElementById('jss').value,
+    ptax: +document.getElementById('ptax').value  };
 }
 
 function update() {
@@ -472,6 +504,7 @@ function update() {
   document.getElementById('new-out').textContent = fmtK(p.newHome);
   document.getElementById('ret-out').textContent = (+document.getElementById('ret').value).toFixed(1) + '%';
   document.getElementById('inf-out').textContent = (+document.getElementById('inf').value).toFixed(2) + '%';
+  document.getElementById('ptax-out').textContent = '$' + (+document.getElementById('ptax').value).toLocaleString();
   
 
   const rows = runModel(p);
@@ -503,7 +536,12 @@ function update() {
   const savings = totalNY - totalCT;
   document.getElementById('m-statetax').textContent = fmtK(totalStateTax);
   document.getElementById('m-statetax-label').textContent = currentState + ' state taxes (28yr)';
-  document.getElementById('m-savings').textContent = savings >= 0 ? '+' + fmtK(savings) : fmtK(savings);
+  const totalCA = (() => { const saved = currentState; currentState='CA'; const r=runModel(p); currentState=saved; return r.reduce((a,x)=>a+x.st,0); })();
+  const bestState = Math.min(totalCT, totalNY, totalCA);
+  const worstState = Math.max(totalCT, totalNY, totalCA);
+  const savingsVsBest = totalStateTax - bestState;
+  document.getElementById('m-savings').textContent = (savingsVsBest <= 0 ? 'Lowest!' : '+' + fmtK(savingsVsBest) + ' vs best');
+  document.getElementById('m-savings').parentElement.querySelector('.msub').textContent = 'CT:' + fmtK(totalCT) + ' NY:' + fmtK(totalNY) + ' CA:' + fmtK(totalCA);
   document.getElementById('m-avgstate').textContent = fmt(avgStateTax) + '/yr';
   document.getElementById('m-avgstate-label').textContent = currentState + ' avg per year';
   document.getElementById('m-effrate').textContent = effRate.toFixed(1) + '%';
@@ -522,7 +560,7 @@ function update() {
     type: 'line',
     data: { labels, datasets: [
       { label: '401k', data: tot401k, borderColor: '#1a2744', backgroundColor: 'rgba(26,39,68,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
-      { label: 'House Cash', data: hcash, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+      { label: 'Cash Acct', data: hcash, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
       { label: 'Total Portfolio', data: totPort, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [4,3] },
       { label: 'House Value', data: houseValData, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 0, borderDash: [2,2] },
       { label: 'Total Assets', data: totAssets, borderColor: '#7c3aed', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2.5, pointRadius: 0 }
@@ -542,7 +580,7 @@ function update() {
       { label: 'SS+Pension', data: ssData, backgroundColor: '#3b82f6' },
       { label: 'Stefan 401k W/D', data: wd4kS, backgroundColor: '#f59e0b' },
       { label: 'Julie 401k W/D', data: wd4kJ, backgroundColor: '#f97316' },
-      { label: 'House Cash', data: wdH, backgroundColor: '#10b981' }
+      { label: 'Cash Acct', data: wdH, backgroundColor: '#10b981' }
     ]},
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
   });
@@ -551,6 +589,10 @@ function update() {
   const stTax = rows.map(r => Math.round(r.st));
   const ctTaxData = rowsCT.map(r => Math.round(r.st));
   const nyTaxData = rowsNY.map(r => Math.round(r.st));
+  const savedSt = currentState; currentState = 'CA';
+  const rowsCA = runModel(p);
+  currentState = savedSt;
+  const caTaxData = rowsCA.map(r => Math.round(r.st));
   document.getElementById('tax-chart-title').textContent = 'Tax Breakdown: Federal + ' + currentState + ' State by Year';
   if (taxChart) taxChart.destroy();
   taxChart = new Chart(document.getElementById('taxChart'), {
@@ -567,7 +609,8 @@ function update() {
     type: 'line',
     data: { labels, datasets: [
       { label: 'Connecticut', data: ctTaxData, borderColor: '#1a2744', backgroundColor: 'rgba(26,39,68,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
-      { label: 'New York', data: nyTaxData, borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [4,3] }
+      { label: 'New York', data: nyTaxData, borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [4,3] },
+      { label: 'California', data: caTaxData, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3, borderWidth: 2, pointRadius: 0, borderDash: [2,2] }
     ]},
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => '$' + Math.round(v/1000) + 'k', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font: { size: 10 } } } } }
   });
