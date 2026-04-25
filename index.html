@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0058)file:///Users/stefan/Downloads/retirement_dashboard_8.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Retirement Planning Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="./Retirement Planning Dashboard_files/chart.umd.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f7f4; color: #1a1a1a; font-size: 14px; }
@@ -69,7 +69,7 @@
 <div class="header">
   <div>
     <div class="h1">Retirement Planning Dashboard</div>
-    <div class="subtitle">Stefan & Julie · Interactive Projection Model</div>
+    <div class="subtitle">Stefan &amp; Julie · Interactive Projection Model</div>
   </div>
   <div style="font-size:12px;opacity:0.5;">Ages 69–96</div>
 </div>
@@ -81,7 +81,7 @@
     <div class="tier-box">
       <div class="tier-label">Tier 1 — Early Retirement</div>
       <div class="slider-row">
-        <label>Net Goal <span id="t1g-out">$240,000</span></label>
+        <label>Net Goal <span id="t1g-out">$230k</span></label>
         <input type="range" id="t1g" min="100000" max="400000" step="5000" value="200000">
       </div>
       <div class="slider-row">
@@ -93,7 +93,7 @@
     <div class="tier-box" style="background:#fff8ec;border-color:#f5d68a;">
       <div class="tier-label" style="color:#b07d00;">Tier 2 — Mid Retirement</div>
       <div class="slider-row">
-        <label>Net Goal <span id="t2g-out">$180,000</span></label>
+        <label>Net Goal <span id="t2g-out">$180k</span></label>
         <input type="range" id="t2g" min="80000" max="300000" step="5000" value="180000">
       </div>
       <div class="slider-row">
@@ -105,7 +105,7 @@
     <div class="tier-box" style="background:#ecfdf5;border-color:#86efac;">
       <div class="tier-label" style="color:#065f46;">Tier 3 — Late Retirement</div>
       <div class="slider-row">
-        <label>Net Goal <span id="t3g-out">$150,000</span></label>
+        <label>Net Goal <span id="t3g-out">$150k</span></label>
         <input type="range" id="t3g" min="60000" max="250000" step="5000" value="150000">
       </div>
     </div>
@@ -116,19 +116,24 @@
       <input type="range" id="s4k" min="0" max="2000000" step="10000" value="660000">
     </div>
     <div class="slider-row">
-      <label>Julie 401k <span id="j4k-out">$1,340k</span></label>
+      <label>Julie 401k <span id="j4k-out">$1.4M</span></label>
       <input type="range" id="j4k" min="0" max="3000000" step="10000" value="1400000">
     </div>
 
     <h2>Real Estate</h2>
     <div class="slider-row">
-      <label>Home Sale Proceeds <span id="old-out">$1,900k</span></label>
+      <label>Home Sale Proceeds <span id="old-out">$1.9M</span></label>
       <input type="range" id="old" min="500000" max="4000000" step="50000" value="1900000">
     </div>
     <div class="slider-row">
-      <label>New Home Cost <span id="new-out">$1,100k</span></label>
+      <label>New Home Cost <span id="new-out">$1.1M</span></label>
       <input type="range" id="new" min="200000" max="2500000" step="50000" value="1100000">
     </div>
+    <div class="slider-row">
+      <label>Cash Acct at Age 69 <span id="cash69-out">$120,000</span></label>
+      <input type="range" id="cash69" min="30000" max="150000" step="5000" value="120000">
+    </div>
+    <div style="font-size:11px;color:#888;padding:0 0 6px;line-height:1.5;">House sale proceeds added at age 70. Cash acct covers age 69 spending gap only.</div>
 
     <h2>Market Assumptions</h2>
     <div class="slider-row">
@@ -136,24 +141,24 @@
       <input type="range" id="ret" min="0" max="10" step="0.5" value="3">
     </div>
     <div class="slider-row">
-      <label>Inflation Rate <span id="inf-out">2.0%</span></label>
+      <label>Inflation Rate <span id="inf-out">2.00%</span></label>
       <input type="range" id="inf" min="0" max="6" step="0.25" value="2">
     </div>
     
     <h2>Social Security</h2>
     <div class="slider-row" style="margin-bottom:10px;">
-      <label style="margin-bottom:6px;display:block;">Julie SS Start Age & Monthly Benefit</label>
+      <label style="margin-bottom:6px;display:block;">Julie SS Start Age &amp; Monthly Benefit</label>
       <select id="jss" style="width:100%;padding:6px 8px;border:1px solid #d0cdc6;border-radius:6px;font-size:13px;background:white;color:#1a2744;cursor:pointer;">
         <option value="66">Age 66 — $3,641/mo</option>
         <option value="67">Age 67 — $3,900/mo</option>
         <option value="68">Age 68 — $4,135/mo</option>
-        <option value="69" selected>Age 69 — $4,447/mo</option>
+        <option value="69" selected="">Age 69 — $4,447/mo</option>
         <option value="70">Age 70 — $4,838/mo</option>
       </select>
     </div>
     <div style="font-size:11px;color:#888;padding:4px 0 8px;">Stefan SS: $4,000/mo (fixed). Pension: $1,600/mo (fixed).</div>
 
-    <h2>Property Tax & SALT</h2>
+    <h2>Property Tax &amp; SALT</h2>
     <div class="slider-row">
       <label>Annual Property Tax <span id="ptax-out">$20,000</span></label>
       <input type="range" id="ptax" min="0" max="40000" step="1000" value="20000">
@@ -162,9 +167,9 @@
 
     <h2>State of Residence</h2>
     <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button id="btn-ct" onclick="setState('CT')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #1a2744;background:#1a2744;color:white;font-weight:700;font-size:12px;cursor:pointer;">Connecticut</button>
-      <button id="btn-ny" onclick="setState('NY')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">New York</button>
-      <button id="btn-ca" onclick="setState('CA')" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">California</button>
+      <button id="btn-ct" onclick="setState(&#39;CT&#39;)" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #1a2744;background:#1a2744;color:white;font-weight:700;font-size:12px;cursor:pointer;">Connecticut</button>
+      <button id="btn-ny" onclick="setState(&#39;NY&#39;)" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">New York</button>
+      <button id="btn-ca" onclick="setState(&#39;CA&#39;)" style="flex:1;padding:8px 0;border-radius:6px;border:2px solid #d0cdc6;background:white;color:#888;font-weight:700;font-size:12px;cursor:pointer;">California</button>
     </div>
     <div id="state-note" style="font-size:11px;color:#888;padding:4px 0 8px;line-height:1.5;">CT: SS exempt (AGI&lt;$100k), 75% 401k/pension deduction, 3–6.99% rates.</div>
   </div>
@@ -173,49 +178,49 @@
     <div class="metrics">
       <div class="metric">
         <div class="mlabel">Starting Portfolio</div>
-        <div class="mval" id="m-start">$2.0M</div>
-        <div class="msub">401k + house cash</div>
+        <div class="mval" id="m-start">$2.2M</div>
+        <div class="msub">401k + cash acct (house sale at 70)</div>
       </div>
-      <div class="metric" id="m-port-card">
+      <div class="metric good" id="m-port-card">
         <div class="mlabel">Portfolio at 96</div>
-        <div class="mval" id="m-end">—</div>
-        <div class="msub" id="m-end-sub">financial assets</div>
+        <div class="mval" id="m-end">$1.7M</div>
+        <div class="msub" id="m-end-sub">financial assets (house: $1.9M)</div>
       </div>
       <div class="metric">
         <div class="mlabel">Avg Annual Income</div>
-        <div class="mval" id="m-income">—</div>
+        <div class="mval" id="m-income">$243,155</div>
         <div class="msub">after-tax, yr 1 dollars</div>
       </div>
       <div class="metric">
         <div class="mlabel">Peak Annual Income</div>
-        <div class="mval" id="m-monthly">—</div>
+        <div class="mval" id="m-monthly">$22,964</div>
         <div class="msub">after-tax, nominal</div>
       </div>
     </div>
     <div class="metrics" style="margin-bottom:16px;">
       <div class="metric">
         <div class="mlabel">28yr Total State Tax</div>
-        <div class="mval" id="m-statetax">—</div>
-        <div class="msub" id="m-statetax-label">CT state taxes</div>
+        <div class="mval" id="m-statetax">$160k</div>
+        <div class="msub" id="m-statetax-label">CT state taxes (28yr)</div>
       </div>
-      <div class="metric good">
+      <div class="metric warn">
         <div class="mlabel">CT vs NY Savings</div>
-        <div class="mval" id="m-savings">—</div>
-        <div class="msub">if living in CT vs NY</div>
+        <div class="mval" id="m-savings">+$68k vs best</div>
+        <div class="msub">CT:$160k NY:$93k CA:$116k</div>
       </div>
       <div class="metric">
         <div class="mlabel">Avg Annual State Tax</div>
-        <div class="mval" id="m-avgstate">—</div>
-        <div class="msub" id="m-avgstate-label">per year</div>
+        <div class="mval" id="m-avgstate">$5,728/yr</div>
+        <div class="msub" id="m-avgstate-label">CT avg per year</div>
       </div>
       <div class="metric">
         <div class="mlabel">Effective State Rate</div>
-        <div class="mval" id="m-effrate">—</div>
+        <div class="mval" id="m-effrate">2.1%</div>
         <div class="msub">avg on gross income</div>
       </div>
       <div class="metric good">
         <div class="mlabel">Total Assets at 96</div>
-        <div class="mval" id="m-ta">—</div>
+        <div class="mval" id="m-ta">$3.6M</div>
         <div class="msub">incl. house value</div>
       </div>
     </div>
@@ -231,7 +236,7 @@
           <span><span class="dot" style="background:#7c3aed"></span>Total Assets</span>
         </div>
         <div style="position:relative;height:200px;">
-          <canvas id="portChart" role="img" aria-label="Portfolio balance chart over time"></canvas>
+          <canvas id="portChart" role="img" aria-label="Portfolio balance chart over time" style="box-sizing: border-box; display: block; height: 200px; width: 778px;" width="1556" height="400"></canvas>
         </div>
       </div>
       <div class="chart-box">
@@ -240,10 +245,10 @@
           <span><span class="dot" style="background:#3b82f6"></span>SS + Pension</span>
           <span><span class="dot" style="background:#f59e0b"></span>Stefan 401k W/D</span>
           <span><span class="dot" style="background:#f97316"></span>Julie 401k W/D</span>
-          <span><span class="dot" style="background:#10b981"></span>House Cash</span>
+          <span><span class="dot" style="background:#10b981"></span>Cash Acct W/D</span>
         </div>
         <div style="position:relative;height:200px;">
-          <canvas id="incomeChart" role="img" aria-label="Annual income sources stacked chart"></canvas>
+          <canvas id="incomeChart" role="img" aria-label="Annual income sources stacked chart" style="box-sizing: border-box; display: block; height: 200px; width: 778px;" width="1556" height="400"></canvas>
         </div>
       </div>
     </div>
@@ -255,7 +260,7 @@
         <span><span class="dot" style="background:#e67e22"></span>State Tax (CT)</span>
       </div>
       <div style="position:relative;height:160px;">
-        <canvas id="taxChart" role="img" aria-label="Tax burden chart by year"></canvas>
+        <canvas id="taxChart" role="img" aria-label="Tax burden chart by year" style="box-sizing: border-box; display: block; height: 160px; width: 1598px;" width="3196" height="320"></canvas>
       </div>
     </div>
 
@@ -266,7 +271,7 @@
         <span><span class="dot" style="background:#e74c3c"></span>New York</span>
       </div>
       <div style="position:relative;height:160px;">
-        <canvas id="compareChart" role="img" aria-label="CT vs NY state tax comparison by year"></canvas>
+        <canvas id="compareChart" role="img" aria-label="CT vs NY state tax comparison by year" style="box-sizing: border-box; display: block; height: 160px; width: 1598px;" width="3196" height="320"></canvas>
       </div>
     </div>
 
@@ -286,7 +291,7 @@
               <th>Pension</th>
               <th>Stefan W/D</th>
               <th>Julie W/D</th>
-              <th>House W/D</th>
+              <th>Cash Acct W/D</th>
               <th>Fed Tax</th>
               <th id="th-statetax">State Tax (CT)</th>
               <th>After-Tax</th>
@@ -301,7 +306,567 @@
               <th>Total Assets</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody">
+    <tr class="tier1">
+      <td>69</td>
+      <td>$48,000</td>
+      <td>$19,200</td>
+      <td>$15,884</td>
+      <td>$33,693</td>
+      <td>$120,000</td>
+      <td style="color:#c0392b">$6,409</td>
+      <td style="color:#e67e22">$368</td>
+      <td style="font-weight:700;color:#1a7a4a">$230,000</td>
+      <td style="font-weight:600">$19,167</td>
+      <td style="color:#666">2.7%</td>
+      <td style="color:#666">0.2%</td>
+      <td class="">$663,439</td>
+      <td class="">$1,407,296</td>
+      <td class="">$0</td>
+      <td style="font-weight:700">$2,070,735</td>
+      <td>$1,100,000</td>
+      <td style="font-weight:700;color:#1a2744">$3,170,735</td>
+    </tr>
+    <tr class="tier1">
+      <td>70</td>
+      <td>$48,960</td>
+      <td>$19,584</td>
+      <td>$0</td>
+      <td>$0</td>
+      <td>$166,056</td>
+      <td style="color:#c0392b">$0</td>
+      <td style="color:#e67e22">$0</td>
+      <td style="font-weight:700;color:#1a7a4a">$234,600</td>
+      <td style="font-weight:600">$19,550</td>
+      <td style="color:#666">0.0%</td>
+      <td style="color:#666">0.0%</td>
+      <td class="">$683,343</td>
+      <td class="">$1,449,515</td>
+      <td class="">$652,962</td>
+      <td style="font-weight:700">$2,785,820</td>
+      <td>$1,122,000</td>
+      <td style="font-weight:700;color:#1a2744">$3,907,820</td>
+    </tr>
+    <tr class="tier1">
+      <td>71</td>
+      <td>$49,939</td>
+      <td>$19,976</td>
+      <td>$0</td>
+      <td>$0</td>
+      <td>$169,377</td>
+      <td style="color:#c0392b">$0</td>
+      <td style="color:#e67e22">$0</td>
+      <td style="font-weight:700;color:#1a7a4a">$239,292</td>
+      <td style="font-weight:600">$19,941</td>
+      <td style="color:#666">0.0%</td>
+      <td style="color:#666">0.0%</td>
+      <td class="">$703,843</td>
+      <td class="">$1,493,000</td>
+      <td class="">$498,093</td>
+      <td style="font-weight:700">$2,694,936</td>
+      <td>$1,144,440</td>
+      <td style="font-weight:700;color:#1a2744">$3,839,376</td>
+    </tr>
+    <tr class="tier1">
+      <td>72</td>
+      <td>$107,568</td>
+      <td>$20,375</td>
+      <td>$0</td>
+      <td>$0</td>
+      <td>$116,134</td>
+      <td style="color:#c0392b">$0</td>
+      <td style="color:#e67e22">$0</td>
+      <td style="font-weight:700;color:#1a7a4a">$244,078</td>
+      <td style="font-weight:600">$20,340</td>
+      <td style="color:#666">0.0%</td>
+      <td style="color:#666">0.0%</td>
+      <td class="">$724,958</td>
+      <td class="">$1,537,790</td>
+      <td class="">$393,417</td>
+      <td style="font-weight:700">$2,656,166</td>
+      <td>$1,167,329</td>
+      <td style="font-weight:700;color:#1a2744">$3,823,494</td>
+    </tr>
+    <tr class="tier1">
+      <td>73</td>
+      <td>$109,720</td>
+      <td>$20,783</td>
+      <td>$8,765</td>
+      <td>$18,592</td>
+      <td>$96,891</td>
+      <td style="color:#c0392b">$5,775</td>
+      <td style="color:#e67e22">$16</td>
+      <td style="font-weight:700;color:#1a7a4a">$248,959</td>
+      <td style="font-weight:600">$20,747</td>
+      <td style="color:#666">2.3%</td>
+      <td style="color:#666">0.0%</td>
+      <td class="">$737,679</td>
+      <td class="">$1,564,774</td>
+      <td class="">$305,422</td>
+      <td style="font-weight:700">$2,607,875</td>
+      <td>$1,190,675</td>
+      <td style="font-weight:700;color:#1a2744">$3,798,550</td>
+    </tr>
+    <tr class="tier1">
+      <td>74</td>
+      <td>$111,914</td>
+      <td>$21,198</td>
+      <td>$9,268</td>
+      <td>$19,660</td>
+      <td>$98,680</td>
+      <td style="color:#c0392b">$6,328</td>
+      <td style="color:#e67e22">$454</td>
+      <td style="font-weight:700;color:#1a7a4a">$253,939</td>
+      <td style="font-weight:600">$21,162</td>
+      <td style="color:#666">2.4%</td>
+      <td style="color:#666">0.2%</td>
+      <td class="">$750,263</td>
+      <td class="">$1,591,467</td>
+      <td class="">$212,944</td>
+      <td style="font-weight:700">$2,554,675</td>
+      <td>$1,214,489</td>
+      <td style="font-weight:700;color:#1a2744">$3,769,164</td>
+    </tr>
+    <tr class="tier1">
+      <td>75</td>
+      <td>$114,152</td>
+      <td>$21,622</td>
+      <td>$9,771</td>
+      <td>$20,727</td>
+      <td>$100,636</td>
+      <td style="color:#c0392b">$6,885</td>
+      <td style="color:#e67e22">$1,008</td>
+      <td style="font-weight:700;color:#1a7a4a">$259,017</td>
+      <td style="font-weight:600">$21,585</td>
+      <td style="color:#666">2.6%</td>
+      <td style="color:#666">0.4%</td>
+      <td class="">$762,707</td>
+      <td class="">$1,617,862</td>
+      <td class="">$115,677</td>
+      <td style="font-weight:700">$2,496,246</td>
+      <td>$1,238,779</td>
+      <td style="font-weight:700;color:#1a2744">$3,735,025</td>
+    </tr>
+    <tr class="tier2">
+      <td>76</td>
+      <td>$116,435</td>
+      <td>$22,055</td>
+      <td>$29,871</td>
+      <td>$63,362</td>
+      <td>$6,499</td>
+      <td style="color:#c0392b">$25,737</td>
+      <td style="color:#e67e22">$5,722</td>
+      <td style="font-weight:700;color:#1a7a4a">$206,763</td>
+      <td style="font-weight:600">$17,230</td>
+      <td style="color:#666">10.8%</td>
+      <td style="color:#666">2.4%</td>
+      <td class="">$754,821</td>
+      <td class="">$1,601,135</td>
+      <td class="">$112,454</td>
+      <td style="font-weight:700">$2,468,410</td>
+      <td>$1,263,554</td>
+      <td style="font-weight:700;color:#1a2744">$3,731,964</td>
+    </tr>
+    <tr class="tier2">
+      <td>77</td>
+      <td>$118,764</td>
+      <td>$22,496</td>
+      <td>$30,678</td>
+      <td>$65,074</td>
+      <td>$6,627</td>
+      <td style="color:#c0392b">$26,823</td>
+      <td style="color:#e67e22">$5,917</td>
+      <td style="font-weight:700;color:#1a7a4a">$210,899</td>
+      <td style="font-weight:600">$17,575</td>
+      <td style="color:#666">11.0%</td>
+      <td style="color:#666">2.4%</td>
+      <td class="">$745,868</td>
+      <td class="">$1,582,143</td>
+      <td class="">$109,001</td>
+      <td style="font-weight:700">$2,437,012</td>
+      <td>$1,288,825</td>
+      <td style="font-weight:700;color:#1a2744">$3,725,837</td>
+    </tr>
+    <tr class="tier2">
+      <td>78</td>
+      <td>$121,139</td>
+      <td>$22,946</td>
+      <td>$31,468</td>
+      <td>$66,750</td>
+      <td>$6,832</td>
+      <td style="color:#c0392b">$27,909</td>
+      <td style="color:#e67e22">$6,110</td>
+      <td style="font-weight:700;color:#1a7a4a">$215,117</td>
+      <td style="font-weight:600">$17,926</td>
+      <td style="color:#666">11.2%</td>
+      <td style="color:#666">2.5%</td>
+      <td class="">$735,832</td>
+      <td class="">$1,560,855</td>
+      <td class="">$105,234</td>
+      <td style="font-weight:700">$2,401,921</td>
+      <td>$1,314,602</td>
+      <td style="font-weight:700;color:#1a2744">$3,716,522</td>
+    </tr>
+    <tr class="tier2">
+      <td>79</td>
+      <td>$123,562</td>
+      <td>$23,405</td>
+      <td>$32,273</td>
+      <td>$68,459</td>
+      <td>$7,043</td>
+      <td style="color:#c0392b">$29,016</td>
+      <td style="color:#e67e22">$6,307</td>
+      <td style="font-weight:700;color:#1a7a4a">$219,419</td>
+      <td style="font-weight:600">$18,285</td>
+      <td style="color:#666">11.4%</td>
+      <td style="color:#666">2.5%</td>
+      <td class="">$724,665</td>
+      <td class="">$1,537,168</td>
+      <td class="">$101,137</td>
+      <td style="font-weight:700">$2,362,970</td>
+      <td>$1,340,894</td>
+      <td style="font-weight:700;color:#1a2744">$3,703,864</td>
+    </tr>
+    <tr class="tier2">
+      <td>80</td>
+      <td>$126,033</td>
+      <td>$23,873</td>
+      <td>$33,000</td>
+      <td>$70,000</td>
+      <td>$7,473</td>
+      <td style="color:#c0392b">$30,080</td>
+      <td style="color:#e67e22">$6,491</td>
+      <td style="font-weight:700;color:#1a7a4a">$223,807</td>
+      <td style="font-weight:600">$18,651</td>
+      <td style="color:#666">11.6%</td>
+      <td style="color:#666">2.5%</td>
+      <td class="">$712,415</td>
+      <td class="">$1,511,183</td>
+      <td class="">$96,475</td>
+      <td style="font-weight:700">$2,320,073</td>
+      <td>$1,367,712</td>
+      <td style="font-weight:700;color:#1a2744">$3,687,784</td>
+    </tr>
+    <tr class="tier2">
+      <td>81</td>
+      <td>$128,554</td>
+      <td>$24,350</td>
+      <td>$33,773</td>
+      <td>$71,640</td>
+      <td>$7,839</td>
+      <td style="color:#c0392b">$31,187</td>
+      <td style="color:#e67e22">$6,685</td>
+      <td style="font-weight:700;color:#1a7a4a">$228,284</td>
+      <td style="font-weight:600">$19,024</td>
+      <td style="color:#666">11.7%</td>
+      <td style="color:#666">2.5%</td>
+      <td class="">$699,001</td>
+      <td class="">$1,482,730</td>
+      <td class="">$91,295</td>
+      <td style="font-weight:700">$2,273,026</td>
+      <td>$1,395,066</td>
+      <td style="font-weight:700;color:#1a2744">$3,668,092</td>
+    </tr>
+    <tr class="tier2">
+      <td>82</td>
+      <td>$131,125</td>
+      <td>$24,837</td>
+      <td>$34,620</td>
+      <td>$73,436</td>
+      <td>$8,080</td>
+      <td style="color:#c0392b">$32,357</td>
+      <td style="color:#e67e22">$6,892</td>
+      <td style="font-weight:700;color:#1a7a4a">$232,849</td>
+      <td style="font-weight:600">$19,404</td>
+      <td style="color:#666">11.9%</td>
+      <td style="color:#666">2.5%</td>
+      <td class="">$684,313</td>
+      <td class="">$1,451,573</td>
+      <td class="">$85,711</td>
+      <td style="font-weight:700">$2,221,597</td>
+      <td>$1,422,967</td>
+      <td style="font-weight:700;color:#1a2744">$3,644,564</td>
+    </tr>
+    <tr class="tier3">
+      <td>83</td>
+      <td>$133,748</td>
+      <td>$25,334</td>
+      <td>$35,410</td>
+      <td>$75,112</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$33,499</td>
+      <td style="color:#e67e22">$7,091</td>
+      <td style="font-weight:700;color:#1a7a4a">$229,013</td>
+      <td style="font-weight:600">$19,084</td>
+      <td style="color:#666">12.4%</td>
+      <td style="color:#666">2.6%</td>
+      <td class="">$668,370</td>
+      <td class="">$1,417,755</td>
+      <td class="">$120,307</td>
+      <td style="font-weight:700">$2,206,432</td>
+      <td>$1,451,427</td>
+      <td style="font-weight:700;color:#1a2744">$3,657,858</td>
+    </tr>
+    <tr class="tier3">
+      <td>84</td>
+      <td>$136,423</td>
+      <td>$25,841</td>
+      <td>$36,160</td>
+      <td>$76,704</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$34,652</td>
+      <td style="color:#e67e22">$7,285</td>
+      <td style="font-weight:700;color:#1a7a4a">$233,190</td>
+      <td style="font-weight:600">$19,433</td>
+      <td style="color:#666">12.6%</td>
+      <td style="color:#666">2.6%</td>
+      <td class="">$651,176</td>
+      <td class="">$1,381,283</td>
+      <td class="">$156,165</td>
+      <td style="font-weight:700">$2,188,624</td>
+      <td>$1,480,455</td>
+      <td style="font-weight:700;color:#1a2744">$3,669,079</td>
+    </tr>
+    <tr class="tier3">
+      <td>85</td>
+      <td>$139,151</td>
+      <td>$26,357</td>
+      <td>$36,961</td>
+      <td>$78,402</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$35,933</td>
+      <td style="color:#e67e22">$7,488</td>
+      <td style="font-weight:700;color:#1a7a4a">$237,450</td>
+      <td style="font-weight:600">$19,788</td>
+      <td style="color:#666">12.8%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$632,642</td>
+      <td class="">$1,341,968</td>
+      <td class="">$193,329</td>
+      <td style="font-weight:700">$2,167,938</td>
+      <td>$1,510,064</td>
+      <td style="font-weight:700;color:#1a2744">$3,678,002</td>
+    </tr>
+    <tr class="tier3">
+      <td>86</td>
+      <td>$141,934</td>
+      <td>$26,885</td>
+      <td>$37,626</td>
+      <td>$79,813</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$37,125</td>
+      <td style="color:#e67e22">$7,669</td>
+      <td style="font-weight:700;color:#1a7a4a">$241,463</td>
+      <td style="font-weight:600">$20,122</td>
+      <td style="color:#666">13.0%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$612,866</td>
+      <td class="">$1,300,020</td>
+      <td class="">$231,498</td>
+      <td style="font-weight:700">$2,144,384</td>
+      <td>$1,540,266</td>
+      <td style="font-weight:700;color:#1a2744">$3,684,650</td>
+    </tr>
+    <tr class="tier3">
+      <td>87</td>
+      <td>$144,773</td>
+      <td>$27,422</td>
+      <td>$38,428</td>
+      <td>$81,514</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$38,434</td>
+      <td style="color:#e67e22">$7,876</td>
+      <td style="font-weight:700;color:#1a7a4a">$245,828</td>
+      <td style="font-weight:600">$20,486</td>
+      <td style="color:#666">13.2%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$591,671</td>
+      <td class="">$1,255,061</td>
+      <td class="">$270,981</td>
+      <td style="font-weight:700">$2,117,713</td>
+      <td>$1,571,071</td>
+      <td style="font-weight:700;color:#1a2744">$3,688,784</td>
+    </tr>
+    <tr class="tier3">
+      <td>88</td>
+      <td>$147,668</td>
+      <td>$27,971</td>
+      <td>$38,969</td>
+      <td>$82,660</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$39,561</td>
+      <td style="color:#e67e22">$8,038</td>
+      <td style="font-weight:700;color:#1a7a4a">$249,668</td>
+      <td style="font-weight:600">$20,806</td>
+      <td style="color:#666">13.3%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$569,284</td>
+      <td class="">$1,207,572</td>
+      <td class="">$311,192</td>
+      <td style="font-weight:700">$2,088,048</td>
+      <td>$1,602,492</td>
+      <td style="font-weight:700;color:#1a2744">$3,690,540</td>
+    </tr>
+    <tr class="tier3">
+      <td>89</td>
+      <td>$150,622</td>
+      <td>$28,530</td>
+      <td>$39,592</td>
+      <td>$83,984</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$40,765</td>
+      <td style="color:#e67e22">$8,217</td>
+      <td style="font-weight:700;color:#1a7a4a">$253,746</td>
+      <td style="font-weight:600">$21,145</td>
+      <td style="color:#666">13.5%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$545,582</td>
+      <td class="">$1,157,296</td>
+      <td class="">$352,307</td>
+      <td style="font-weight:700">$2,055,185</td>
+      <td>$1,634,542</td>
+      <td style="font-weight:700;color:#1a2744">$3,689,727</td>
+    </tr>
+    <tr class="tier3">
+      <td>90</td>
+      <td>$153,634</td>
+      <td>$29,101</td>
+      <td>$40,077</td>
+      <td>$85,011</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$41,880</td>
+      <td style="color:#e67e22">$8,373</td>
+      <td style="font-weight:700;color:#1a7a4a">$257,570</td>
+      <td style="font-weight:600">$21,464</td>
+      <td style="color:#666">13.6%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$520,671</td>
+      <td class="">$1,104,454</td>
+      <td class="">$394,003</td>
+      <td style="font-weight:700">$2,019,127</td>
+      <td>$1,667,233</td>
+      <td style="font-weight:700;color:#1a2744">$3,686,360</td>
+    </tr>
+    <tr class="tier3">
+      <td>91</td>
+      <td>$156,707</td>
+      <td>$29,683</td>
+      <td>$40,335</td>
+      <td>$85,558</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$42,839</td>
+      <td style="color:#e67e22">$8,491</td>
+      <td style="font-weight:700;color:#1a7a4a">$260,952</td>
+      <td style="font-weight:600">$21,746</td>
+      <td style="color:#666">13.7%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$494,746</td>
+      <td class="">$1,049,462</td>
+      <td class="">$435,749</td>
+      <td style="font-weight:700">$1,979,958</td>
+      <td>$1,700,578</td>
+      <td style="font-weight:700;color:#1a2744">$3,680,535</td>
+    </tr>
+    <tr class="tier3">
+      <td>92</td>
+      <td>$159,841</td>
+      <td>$30,276</td>
+      <td>$40,742</td>
+      <td>$86,422</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$43,926</td>
+      <td style="color:#e67e22">$8,637</td>
+      <td style="font-weight:700;color:#1a7a4a">$264,718</td>
+      <td style="font-weight:600">$22,060</td>
+      <td style="color:#666">13.8%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$467,625</td>
+      <td class="">$991,932</td>
+      <td class="">$477,850</td>
+      <td style="font-weight:700">$1,937,406</td>
+      <td>$1,734,589</td>
+      <td style="font-weight:700;color:#1a2744">$3,671,995</td>
+    </tr>
+    <tr class="tier3">
+      <td>93</td>
+      <td>$163,038</td>
+      <td>$30,882</td>
+      <td>$40,883</td>
+      <td>$86,722</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$44,830</td>
+      <td style="color:#e67e22">$8,739</td>
+      <td style="font-weight:700;color:#1a7a4a">$267,957</td>
+      <td style="font-weight:600">$22,330</td>
+      <td style="color:#666">13.9%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$439,544</td>
+      <td class="">$932,366</td>
+      <td class="">$519,677</td>
+      <td style="font-weight:700">$1,891,587</td>
+      <td>$1,769,281</td>
+      <td style="font-weight:700;color:#1a2744">$3,660,868</td>
+    </tr>
+    <tr class="tier3">
+      <td>94</td>
+      <td>$166,298</td>
+      <td>$31,500</td>
+      <td>$40,799</td>
+      <td>$86,544</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$45,580</td>
+      <td style="color:#e67e22">$8,803</td>
+      <td style="font-weight:700;color:#1a7a4a">$270,758</td>
+      <td style="font-weight:600">$22,563</td>
+      <td style="color:#666">14.0%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$410,707</td>
+      <td class="">$871,197</td>
+      <td class="">$560,675</td>
+      <td style="font-weight:700">$1,842,578</td>
+      <td>$1,804,667</td>
+      <td style="font-weight:700;color:#1a2744">$3,647,245</td>
+    </tr>
+    <tr class="tier3">
+      <td>95</td>
+      <td>$169,624</td>
+      <td>$32,130</td>
+      <td>$40,629</td>
+      <td>$86,184</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$46,283</td>
+      <td style="color:#e67e22">$8,854</td>
+      <td style="font-weight:700;color:#1a7a4a">$273,430</td>
+      <td style="font-weight:600">$22,786</td>
+      <td style="color:#666">14.1%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$381,180</td>
+      <td class="">$808,563</td>
+      <td class="">$600,585</td>
+      <td style="font-weight:700">$1,790,328</td>
+      <td>$1,840,760</td>
+      <td style="font-weight:700;color:#1a2744">$3,631,088</td>
+    </tr>
+    <tr class="tier3">
+      <td>96</td>
+      <td>$173,017</td>
+      <td>$32,772</td>
+      <td>$40,188</td>
+      <td>$85,247</td>
+      <td>$0</td>
+      <td style="color:#c0392b">$46,798</td>
+      <td style="color:#e67e22">$8,860</td>
+      <td style="font-weight:700;color:#1a7a4a">$275,565</td>
+      <td style="font-weight:600">$22,964</td>
+      <td style="color:#666">14.1%</td>
+      <td style="color:#666">2.7%</td>
+      <td class="">$351,222</td>
+      <td class="">$745,016</td>
+      <td class="">$638,720</td>
+      <td style="font-weight:700">$1,734,959</td>
+      <td>$1,877,575</td>
+      <td style="font-weight:700;color:#1a2744">$3,612,534</td>
+    </tr></tbody>
         </table>
       </div>
     </div>
@@ -416,7 +981,7 @@ function calcTax(w4k, totalSS, pension, ptax) {
 
 function runModel(p) {
   let s401k = p.s4k, j401k = p.j4k;
-  let houseCash = p.old - p.newHome;
+  let houseCash = p.cash69;  // Age 69: only cash account
   let houseVal = p.newHome;
   const rows = [];
   for (let yr = 0; yr < 28; yr++) {
@@ -430,6 +995,7 @@ function runModel(p) {
     const pension = 1600 * 12 * inf;
     const totalSS = sSS + jSS;
     if (yr > 0) houseVal *= (1 + p.infRate);
+    if (yr === 1) houseCash += (p.old - p.newHome);  // House sold at age 70, net proceeds added
     const rPctS = RMD_FACTORS[sAge] ? 1 / RMD_FACTORS[sAge] : 0;
     const rPctJ = RMD_FACTORS[jAge] ? 1 / RMD_FACTORS[jAge] : 0;
     const rmdS = s401k * rPctS, rmdJ = j401k * rPctJ;
@@ -467,7 +1033,7 @@ function runModel(p) {
     const totalPort = s401k + j401k + houseCash;
     const afterTax = totalSS + pension + wH + w4k - ft - st;
     const totalAssets = Math.max(0,s401k) + Math.max(0,j401k) + Math.max(0,houseCash) + houseVal;
-    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, w4kS, w4kJ, wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, totalAssets, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
+    rows.push({ sAge, jAge, sSS, jSS, totalSS, pension, rmdS, rmdJ, w4k, w4kS, w4kJ, wCash: wH, ft, st, afterTax, monthly: afterTax/12, s401k, j401k, houseCash, totalPort, houseVal, totalAssets, target, tier: sAge <= p.t1e ? 1 : (sAge <= p.t2e ? 2 : 3) });
   }
   return rows;
 }
@@ -488,7 +1054,8 @@ function getParams() {
     retRate: +document.getElementById('ret').value / 100,
     infRate: +document.getElementById('inf').value / 100,
     jssAge: +document.getElementById('jss').value,
-    ptax: +document.getElementById('ptax').value  };
+    ptax: +document.getElementById('ptax').value,
+    cash69: +document.getElementById('cash69').value  };
 }
 
 function update() {
@@ -505,10 +1072,11 @@ function update() {
   document.getElementById('ret-out').textContent = (+document.getElementById('ret').value).toFixed(1) + '%';
   document.getElementById('inf-out').textContent = (+document.getElementById('inf').value).toFixed(2) + '%';
   document.getElementById('ptax-out').textContent = '$' + (+document.getElementById('ptax').value).toLocaleString();
+  document.getElementById('cash69-out').textContent = '$' + (+document.getElementById('cash69').value).toLocaleString();
   
 
   const rows = runModel(p);
-  const startPort = p.s4k + p.j4k + (p.old - p.newHome);
+  const startPort = p.s4k + p.j4k + p.cash69;
   const endRow = rows[rows.length - 1];
   const avgIncome = rows.reduce((a, r) => a + r.afterTax, 0) / rows.length;
   const maxMonthly = Math.max(...rows.map(r => r.monthly));
@@ -525,7 +1093,7 @@ function update() {
 
   const totalStateTax = rows.reduce((a, r) => a + r.st, 0);
   const avgStateTax = totalStateTax / rows.length;
-  const totalGross = rows.reduce((a, r) => a + r.totalSS + r.pension + r.wH + r.w4k, 0);
+  const totalGross = rows.reduce((a, r) => a + r.totalSS + r.pension + r.wCash + r.w4k, 0);
   const effRate = totalGross > 0 ? (totalStateTax / totalGross * 100) : 0;
   const savedState = currentState;
   currentState = 'CT'; const rowsCT = runModel(p);
@@ -572,7 +1140,7 @@ function update() {
   const wd4k = rows.map(r => Math.round(r.w4k));
   const wd4kS = rows.map(r => Math.round(r.w4kS));
   const wd4kJ = rows.map(r => Math.round(r.w4kJ));
-  const wdH = rows.map(r => Math.round(r.wH));
+  const wdH = rows.map(r => Math.round(r.wCash));
   if (incomeChart) incomeChart.destroy();
   incomeChart = new Chart(document.getElementById('incomeChart'), {
     type: 'bar',
@@ -624,13 +1192,13 @@ function update() {
       <td>${fmt(r.pension)}</td>
       <td>${fmt(r.w4kS)}</td>
       <td>${fmt(r.w4kJ)}</td>
-      <td>${fmt(r.wH)}</td>
+      <td>${fmt(r.wCash)}</td>
       <td style="color:#c0392b">${fmt(r.ft)}</td>
       <td style="color:#e67e22">${fmt(r.st)}</td>
       <td style="font-weight:700;color:#1a7a4a">${fmt(r.afterTax)}</td>
       <td style="font-weight:600">${fmt(r.monthly)}</td>
-      <td style="color:#666">${((r.ft / (r.totalSS + r.pension + r.w4k + r.wH)) * 100).toFixed(1)}%</td>
-      <td style="color:#666">${((r.st / (r.totalSS + r.pension + r.w4k + r.wH)) * 100).toFixed(1)}%</td>
+      <td style="color:#666">${((r.ft / (r.totalSS + r.pension + r.w4k + r.wCash)) * 100).toFixed(1)}%</td>
+      <td style="color:#666">${((r.st / (r.totalSS + r.pension + r.w4k + r.wCash)) * 100).toFixed(1)}%</td>
       <td class="${r.s401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.s401k))}</td>
       <td class="${r.j401k < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.j401k))}</td>
       <td class="${r.houseCash < 0 ? 'depleted' : ''}">${fmt(Math.max(0, r.houseCash))}</td>
@@ -644,5 +1212,6 @@ document.querySelectorAll('input[type=range], select').forEach(el => el.addEvent
 document.querySelectorAll('input[type=range]').forEach(el => el.addEventListener('input', update));
 update();
 </script>
-</body>
-</html>
+
+
+</body></html>
